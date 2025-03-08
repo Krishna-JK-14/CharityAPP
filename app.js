@@ -66,6 +66,7 @@ app.use((req, res, next) => {
     next();
 });
 
+
 // Passport Google Auth Strategy
 passport.use(new GoogleStrategy({
     clientID: process.env.GOOGLE_CLIENT_ID,
@@ -73,7 +74,6 @@ passport.use(new GoogleStrategy({
     callbackURL: process.env.GOOGLE_CALLBACK_URL
   }, async (accessToken, refreshToken, profile, done) => {
     try {
-      console.log('🔹 Google Profile:', profile);  // Debugging Line
       
       let user = await User.findOne({ googleId: profile.id });
   
@@ -86,10 +86,7 @@ passport.use(new GoogleStrategy({
         });
   
         await user.save();
-        console.log('✅ New User Saved:', user);  // Debugging Line
-      } else {
-        console.log('🟢 User Exists:', user);  // Debugging Line
-      }
+      } 
       
       done(null, user);
     } catch (err) {
@@ -113,6 +110,7 @@ passport.deserializeUser(async (id, done) => {
 
 function ensureAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
+      res.locals.loggedInUserId = req.user._id; 
       return next();
     }
     res.redirect('/');
@@ -126,6 +124,7 @@ app.get('/auth/google',
 app.get('/auth/google/callback',
   passport.authenticate('google', { failureRedirect: '/' }),
   (req, res) => {
+    req.session.userId = req.user._id; 
     res.redirect('/dashboard');
   }
 );
@@ -144,7 +143,7 @@ app.get('/logout', (req, res, next) => {
 
 app.post('/create-event', ensureAuthenticated, async (req, res) => {
     try {
-
+      const { title, date, location, description } = req.body;
         const newEvent = new Event({
             title,
             description,
@@ -199,6 +198,8 @@ app.get('/events', async (req, res) => {
 });
 
 
+
+
 app.post('/events/:eventId/volunteer', ensureAuthenticated, async (req, res) => {
   try {
       const event = await Event.findById(req.params.eventId);
@@ -224,7 +225,6 @@ app.post('/events/:eventId/volunteer', ensureAuthenticated, async (req, res) => 
       res.status(500).send('Error signing up for event');
   }
 });
-
 
 app.get("/event/:id", async (req, res) => {
   try {
@@ -267,13 +267,80 @@ app.post("/events/remove-volunteer/:eventId/:volunteerId", async (req, res) => {
 });
 
 
+// Profile Page Route
+app.get("/profile", ensureAuthenticated, async (req, res) => {
+  try {
+      const loggedInUserId = req.user?._id;  // Get the logged-in user ID
+
+      if (!loggedInUserId) {
+          return res.redirect("/login");  // Redirect if not authenticated
+      }
+
+      // Fetch the logged-in user's details
+      const user = await User.findById(loggedInUserId).select("name email");
+
+      if (!user) {
+          return res.status(404).send("User not found"); // Handle missing user
+      }
+
+      // Fetch events organized by the logged-in user
+      const organizedEvents = await Event.find({ createdBy: loggedInUserId });
+
+      // Fetch events where the logged-in user has volunteered
+      const volunteeredEvents = await Event.find({ volunteers: loggedInUserId });
+
+      res.render("profile", {
+          loggedInUser: user, // Ensure logged-in user data is available
+          user,  // Also pass user (same as loggedInUser)
+          organizedEvents: organizedEvents || [],
+          volunteeredEvents: volunteeredEvents || []
+      });
+
+  } catch (error) {
+      console.error("Error fetching profile details:", error);
+      res.status(500).send("Server Error");
+  }
+});
+
+
+
+app.get('/profile2',ensureAuthenticated, async (req, res) => {
+  try {
+      const userId = req.query.userId;
+      if (!userId) {
+          return res.status(400).send("User ID is required.");
+      }
+
+      // Fetch user details
+      const user = await User.findById(userId);
+      if (!user) {
+          return res.status(404).send("User not found.");
+      }
+
+      // Fetch events organized by the user
+      const organizedEvents = await Event.find({ createdBy: userId });
+
+      // Fetch events the user has volunteered for
+      const volunteeredEvents = await Event.find({ volunteers: userId });
+
+      // Render the profile2 page with user details and events
+      res.render('profile2', { loggedInUser: user, organizedEvents, volunteeredEvents });
+  } catch (error) {
+      console.error("Error fetching user profile:", error);
+      res.status(500).send("Internal Server Error");
+  }
+});
+
+
 
 
 
 // Home Route
-app.get('/', (req, res) => {
-    res.render('index', { title: 'Home', user: req.user });
+app.get("/", (req, res) => {
+  res.render("home", {user: req.user || null }); // Pass user variable
+
 });
+
 
 // Start Server
 app.listen(3000, () => console.log('🚀 Server running on port 3000'));
