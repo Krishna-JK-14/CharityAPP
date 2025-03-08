@@ -1,37 +1,229 @@
-<%- include('partials/header') %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Events</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: auto;
+            padding: 15px;
+        }
+        
+        /* Flash message styling */
+        .flash-message {
+            position: fixed;
+            top: 10px;
+            left: 40%;
+            background-color: rgba(0, 128, 0, 0.9);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 14px;
+            z-index: 1000;
+            display: none;
+            transition: opacity 0.5s ease-in-out;
+            white-space: nowrap;
+        }
+        .flash-message.error {
+            background-color: rgba(255, 0, 0, 0.9);
+        }
+        
+        /* Flex container for search and toggle */
+        .search-toggle-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        /* Search Form */
+        .search-form {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .search-form input {
+            padding: 8px;
+            font-size: 16px;
+            width: 200px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        
+        .search-form button {
+            padding: 8px 15px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        
+        /* Toggle container */
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .toggle-container input {
+            margin-right: 5px;
+        }
+        
+        /* Scrollable Event Box */
+        .event-box {
+            max-height: 500px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 10px;
+            background-color: #f8f8f8;
+            width: 100%;
+            margin: auto;
+        }
+        
+        /* Event Cards */
+        .event-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            text-align: left;
+        }
+        
+        .event-card h3 {
+            margin: 0 0 10px;
+        }
+        
+        .event-status {
+            font-weight: bold;
+            color: #555;
+        }
+        
+        /* Volunteer Button */
+        .volunteer-btn {
+            display: block;
+            width: fit-content;
+            padding: 8px 12px;
+            font-size: 14px;
+            color: white;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        .volunteer-btn:hover {
+            background-color: #0056b3;
+        }
+        
+    </style>
+   
+</head>
+<body>
+    <%- include('partials/header') %>
+    <div id="flash-message" class="flash-message"></div>
 
-<div id="events-container">
-    <h2>Available Events</h2>
+    <div class="container">
+        <h2>Available Events</h2>
 
-    <!-- Search Form -->
-    <form method="GET" action="/events" class="search-form">
-        <input type="text" name="search" placeholder="Search event title..." value="<%= search || '' %>">
-        <input type="text" name="location" placeholder="Search by location..." value="<%= location || '' %>">
-        <button type="submit">Search</button>
-    </form>
+        <div class="search-toggle-container">
+            <form method="GET" action="/events" class="search-form">
+                <input type="text" name="search" placeholder="Search event title..." value="<%= search || '' %>">
+                <input type="text" name="location" placeholder="Search by location..." value="<%= location || '' %>">
+                <button type="submit">Search</button>
+            </form>
 
-    <!-- Scrollable Event Box -->
-    <div class="event-box">
-        <% if (events.length > 0) { %>
-            <% events.forEach(event => { %>
-                <div class="event-card">
+            <div class="toggle-container">
+                <input type="checkbox" id="toggleCompleted">
+                <label for="toggleCompleted">Show Completed Events</label>
+            </div>
+        </div>
+
+        <!-- Scrollable Event Box -->
+        <div class="event-box" id="eventList">
+            <% events.forEach(event => { 
+                let eventDate = new Date(event.date);
+                let currentDate = new Date();
+                let isCompleted = eventDate < currentDate;
+            %>
+                <div class="event-card" data-status="<%= isCompleted ? 'completed' : 'upcoming' %>">
                     <h3><%= event.title %></h3>
-                    <p><strong>Date:</strong> <%= event.date.toDateString() %></p>
+                    <p><strong>Date:</strong> <%= eventDate.toDateString() %></p>
                     <p><strong>Location:</strong> <%= event.location %></p>
                     <p><strong>Description:</strong> <%= event.description %></p>
-                    <p><strong>Created By:</strong> <%= event.createdBy.name %></p>
-                    
-                    <!-- Volunteer Signup Button -->
-                    <form action="/events/<%= event._id %>/volunteer" method="POST">
-                        <button type="submit" class="volunteer-btn">Sign Up as Volunteer</button>
-                    </form>
-                    
+                    <p><strong>Created By:</strong> 
+                        <a href="/profile2?userId=<%= event.createdBy._id %>">
+                            <%= event.createdBy.name %>
+                        </a>
+                    </p>
+                    <p class="event-status" style="color: <%= isCompleted ? 'red' : 'green' %>"><strong>Status:</strong> <%= isCompleted ? 'Completed' : 'Upcoming' %></p>
+                    <% if (!isCompleted) { %>
+                        <form action="/events/<%= event._id %>/volunteer" method="POST">
+                            <button type="submit" class="volunteer-btn">Sign Up as Volunteer</button>
+                        </form>
+                    <% } %>
                 </div>
             <% }) %>
-        <% } else { %>
-            <p>No events found.</p>
-        <% } %>
+        </div>
     </div>
-</div>
 
-<%- include('partials/footer') %>
+    <%- include('partials/footer') %>
+    <script>
+        document.getElementById('toggleCompleted').addEventListener('change', function () {
+            let showCompleted = this.checked;
+            document.querySelectorAll('.event-card').forEach(card => {
+                let status = card.getAttribute('data-status');
+                if (status === 'completed') {
+                    card.style.display = showCompleted ? 'block' : 'none';
+                }
+            });
+        });
+        
+        window.onload = function () {
+            document.getElementById('toggleCompleted').checked = false;
+            document.getElementById('toggleCompleted').dispatchEvent(new Event('change'));
+        };
+            document.addEventListener("DOMContentLoaded", function () {
+                const flashMessage = document.getElementById("flash-message");
+        
+                <% if (messages && messages.success && messages.success.length > 0) { %>
+                    flashMessage.innerText = "<%= messages.success[0] %>";
+                    flashMessage.classList.add("success");
+                    flashMessage.style.display = "block";
+                <% } else if (messages && messages.error && messages.error.length > 0) { %>
+                    flashMessage.innerText = "<%= messages.error[0] %>";
+                    flashMessage.classList.add("error");
+                    flashMessage.style.display = "block";
+                <% } %>
+        
+                // Hide flash message after 2 seconds
+                if (flashMessage.style.display === "block") {
+                    setTimeout(() => {
+                        flashMessage.style.opacity = "0";
+                        setTimeout(() => flashMessage.style.display = "none", 500);
+                    }, 2000);
+                }
+            });
+        
+    </script>
+</body>
+</html>
