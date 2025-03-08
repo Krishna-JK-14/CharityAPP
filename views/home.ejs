@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charity & Volunteer Platform</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+        }
+
+        /* Header Styling */
+        .header {
+            background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
+            padding: 15px 0;
+            text-align: center;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin: 15px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .nav-links a:hover {
+            color: #ffcc00;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            text-align: center;
+            padding: 120px 50px 50px; /* Extra padding for header space */
+            background: linear-gradient(to right, #007bff, #00c6ff);
+            color: white;
+            position: relative;
+        }
+
+        .hero-section h1 {
+            font-size: 42px;
+            margin-bottom: 10px;
+        }
+
+        .hero-section p {
+            font-size: 18px;
+            max-width: 700px;
+            margin: auto;
+        }
+
+        .cta-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 24px;
+            background-color: #ffcc00;
+            color: #333;
+            text-decoration: none;
+            font-size: 18px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        /* Features Section */
+        .features-section {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            padding: 50px;
+            background-color: #fff;
+        }
+
+        .feature {
+            width: 300px;
+            text-align: center;
+        }
+
+        .feature img {
+            border-radius: 10px;
+            width: 100%;
+            max-width: 150px;
+        }
+    </style>
+</head>
+<body>
+    <% if (user) { %>
+        <%- include('partials/header') %> <!-- Header for logged-in users -->
+    <% } else { %>
+        <header class="header">
+            <nav class="nav-links">
+                <a href="/">Home</a>
+                <a href="/events">Events</a>
+                <a href="/auth/google" style="padding: 8px 16px; border: 2px solid white; border-radius: 5px;">Login</a>
+            </nav>
+        </header>
+    <% } %>
+    
+    
+
+    <section class="hero-section">
+        <h1>Welcome to Charity & Volunteer Platform</h1>
+        <p>Join us in making a difference! Connect with organizations, volunteer for events, and support those in need.</p>
+        <% if(user) { %>
+            <a href="/dashboard" class="cta-button">Get Started</a>
+        <% } else { %>
+            <a href="/auth/google" class="cta-button">Get Started</a>
+        <% } %>
+    </section>
+
+    <section class="features-section">
+        <div class="feature">
+            <img src="https://via.placeholder.com/150" alt="Volunteer">
+            <h3>Become a Volunteer</h3>
+            <p>Sign up to help at local charity events and make a real impact in your community.</p>
+        </div>
+        <div class="feature">
+            <img src="https://via.placeholder.com/150" alt="Donate">
+            <h3>Donate for a Cause</h3>
+            <p>Your donations help provide essential resources to those in need. Every contribution counts.</p>
+        </div>
+        <div class="feature">
+            <img src="https://via.placeholder.com/150" alt="Events">
+            <h3>Find Events</h3>
+            <p>Browse charity events happening near you and get involved in meaningful initiatives.</p>
+        </div>
+    </section>
+
+    <%- include('partials/footer') %>
+
+</body>
+</html>
