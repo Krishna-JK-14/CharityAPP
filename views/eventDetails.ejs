@@ -17,21 +17,24 @@
 
         async function fetchImages() {
             const eventId = "<%= event._id %>";
+            const eventDate = new Date("<%= event.date %>");
+            const today = new Date();
+            const isEventCompleted = today > eventDate; // Check if event date has passed
+        
             try {
                 const response = await fetch(`/events/${eventId}/images`);
                 const data = await response.json();
                 const gallery = document.getElementById("imageGallery");
-                gallery.innerHTML = ""; // Clear previous images
+                gallery.innerHTML = "";
         
                 if (data.images.length > 0) {
                     data.images.forEach(image => {
                         const imageContainer = document.createElement("div");
-                        imageContainer.style.marginBottom = "15px";
+                        imageContainer.classList.add("image-item");
         
                         const img = document.createElement("img");
                         img.src = `/uploads/${image}`;
                         img.alt = "Event Proof";
-                        img.width = 200;
         
                         imageContainer.appendChild(img);
                         gallery.appendChild(imageContainer);
@@ -40,36 +43,37 @@
                     gallery.innerHTML = "<p>No images uploaded yet.</p>";
                 }
         
-                // Ensure the "Add New Image" button is always visible
-                const addNewImageForm = document.createElement("form");
-                addNewImageForm.action = `/events/${eventId}/upload`;
-                addNewImageForm.method = "POST";
-                addNewImageForm.enctype = "multipart/form-data";
-                addNewImageForm.style.marginTop = "10px";
+                // Show upload form only if the event is completed
+                if (isEventCompleted) {
+                    const addNewImageForm = document.createElement("form");
+                    addNewImageForm.action = `/events/${eventId}/upload`;
+                    addNewImageForm.method = "POST";
+                    addNewImageForm.enctype = "multipart/form-data";
+                    addNewImageForm.classList.add("image-upload-form");
         
-                const fileInput = document.createElement("input");
-                fileInput.type = "file";
-                fileInput.name = "eventImage";
-                fileInput.accept = "image/*";
-                fileInput.required = true;
+                    const fileInput = document.createElement("input");
+                    fileInput.type = "file";
+                    fileInput.name = "eventImage";
+                    fileInput.accept = "image/*";
+                    fileInput.required = true;
         
-                const uploadButton = document.createElement("button");
-                uploadButton.type = "submit";
-                uploadButton.className = "btn btn-success";
-                uploadButton.textContent = "Add New Image";
-                uploadButton.style.marginLeft = "10px";
+                    const uploadButton = document.createElement("button");
+                    uploadButton.type = "submit";
+                    uploadButton.className = "btn btn-success";
+                    uploadButton.textContent = "Add New Image";
         
-                addNewImageForm.appendChild(fileInput);
-                addNewImageForm.appendChild(uploadButton);
+                    addNewImageForm.appendChild(fileInput);
+                    addNewImageForm.appendChild(uploadButton);
         
-                gallery.appendChild(addNewImageForm);
-        
+                    gallery.appendChild(addNewImageForm);
+                }
             } catch (error) {
                 console.error('Error fetching images:', error);
             }
         }
         
         document.addEventListener("DOMContentLoaded", fetchImages);
+        
     </script>
     <style>
         body {
@@ -77,39 +81,31 @@
             margin: 0;
             padding: 0;
             background-color: #f4f4f4;
-            text-align: center;
         }
+
         .container {
-            max-width: 600px;
-            margin: 30px auto;
+            max-width: 700px;
+            margin: 40px auto;
             background: white;
-            padding: 20px;
+            padding: 25px;
             border-radius: 10px;
             box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
         }
+
+        h2, h3 {
+            text-align: center;
+            color: #333;
+        }
+
         .form-field {
             width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
+            padding: 10px;
+            margin-bottom: 12px;
             border: 1px solid #ccc;
             border-radius: 5px;
             display: block;
         }
-        .volunteer-list {
-            list-style: none;
-            padding: 0;
-        }
-        .volunteer-item {
-            background: #e9f7fe;
-            padding: 10px;
-            margin: 5px 0;
-            border-radius: 5px;
-            font-size: 16px;
-            color: #333;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+
         .btn {
             padding: 10px 15px;
             border: none;
@@ -117,23 +113,71 @@
             cursor: pointer;
             text-decoration: none;
             display: inline-block;
+            transition: background 0.3s ease;
         }
+
         .btn-primary { background: #007bff; color: white; }
+        .btn-primary:hover { background: #0056b3; }
+
         .btn-success { background: #28a745; color: white; }
+        .btn-success:hover { background: #218838; }
+
         .btn-warning { background: #ffc107; color: black; }
+        .btn-warning:hover { background: #e0a800; }
+
         .btn-danger { background: #dc3545; color: white; }
+        .btn-danger:hover { background: #c82333; }
+
+        .volunteer-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 15px;
+        }
+
+        .volunteer-item {
+            background: #e9f7fe;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 5px;
+            font-size: 16px;
+            color: #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        #imageGallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .image-item img {
+            width: 200px;
+            height: auto;
+            border-radius: 5px;
+            box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .image-upload-form {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .image-upload-form input {
+            margin-right: 10px;
+        }
+
+        .action-buttons {
+            text-align: center;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
 
-    <header style="background: #007bff; color: white; padding: 15px; text-align: center;">
-        <h1>Charity Platform</h1>
-        <nav>
-            <a href="/" class="btn btn-primary">Home</a>
-            <a href="/dashboard" class="btn btn-primary">My Events</a>
-            <a href="/logout" class="btn btn-primary">Logout</a>
-        </nav>
-    </header>
+    <%- include('partials/header') %>
 
     <div class="container">
         <div id="eventDetails">
@@ -142,10 +186,11 @@
             <p><strong>Location:</strong> <%= event.location %></p>
             <p><strong>Description:</strong> <%= event.description %></p>
 
-            <button onclick="toggleEditMode()" class="btn btn-warning">Edit Event</button>
+            <div class="action-buttons">
+                <button onclick="toggleEditMode()" class="btn btn-warning">Edit Event</button>
+            </div>
         </div>
 
-        <!-- Edit Form -->
         <form id="editForm" action="/events/update/<%= event._id %>" method="POST" style="display: none;">
             <input type="text" name="title" value="<%= event.title %>" class="form-field">
             <input type="date" name="date" value="<%= event.date.toISOString().split('T')[0] %>" class="form-field">
@@ -156,19 +201,8 @@
             <button type="button" onclick="cancelEdit()" class="btn btn-danger">Cancel</button>
         </form>
 
-        <!-- Event Proof Images -->
         <h3>Event Proof Images</h3>
-        <div id="imageGallery">
-            <% if (event.images.length > 0) { %>
-                <% event.images.forEach(image => { %>
-                    <div style="margin-bottom: 15px;">
-                        <img src="/uploads/<%= image %>" alt="Event Proof" width="200">
-                    </div>
-                <% }) %>
-            <% } else { %>
-                <p>No images uploaded yet.</p>
-            <% } %>
-        </div>
+        <div id="imageGallery"></div>
 
         <h3>Registered Volunteers</h3>
         <ul class="volunteer-list">
@@ -181,13 +215,11 @@
                 </li>
             <% }) %>
         </ul>
+        <a href="/dashboard" class="btn btn-primary" style="margin-left: 38%;">Back to My Events</a>
 
-        <a href="/dashboard" class="btn btn-primary">Back to My Events</a>
     </div>
 
-    <footer style="margin-top: 30px; padding: 10px; background: #333; color: white; text-align: center;">
-        <p>&copy; 2025 Charity Platform. All rights reserved.</p>
-    </footer>
+    <%- include('partials/footer') %>
 
 </body>
 </html>
