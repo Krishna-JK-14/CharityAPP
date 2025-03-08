@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charity Platform</title>
+    <link rel="stylesheet" href="/css/styles.css">
+    <style>
+        /* Flash message styling */
+        .flash-message {
+            position: fixed;
+            top: 10px;
+            left: 40%;
+            background-color: rgba(0, 128, 0, 0.9); /* Green for success */
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 14px;
+            z-index: 1000;
+            display: none;
+            transition: opacity 0.5s ease-in-out;
+            transition: opacity 0.5s ease-in-out;
+            white-space: nowrap;
+        }
+        .flash-message.error {
+            background-color: rgba(255, 0, 0, 0.9); /* Red for error */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="/">Home</a>
+            <% if (user) { %>
+                <a href="/dashboard">Dashboard</a>
+                <a href="/logout">Logout</a>
+            <% } else { %>
+                <a href="/auth/google">Login with Google</a>
+            <% } %>
+        </nav>
+    </header>
+
+    <!-- Flash message container (hidden initially) -->
+    <div id="flash-message" class="flash-message"></div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const flashMessage = document.getElementById("flash-message");
+
+            <% if (messages.success && messages.success.length > 0) { %>
+                flashMessage.innerText = "<%= messages.success[0] %>";
+                flashMessage.classList.add("success");
+                flashMessage.style.display = "block";
+            <% } else if (messages.error && messages.error.length > 0) { %>
+                flashMessage.innerText = "<%= messages.error[0] %>";
+                flashMessage.classList.add("error");
+                flashMessage.style.display = "block";
+            <% } %>
+
+            // Hide flash message after 2 seconds
+            if (flashMessage.style.display === "block") {
+                setTimeout(() => {
+                    flashMessage.style.opacity = "0";
+                    setTimeout(() => flashMessage.style.display = "none", 500);
+                }, 2000);
+            }
+        });
+    </script>
+</body>
+</html>

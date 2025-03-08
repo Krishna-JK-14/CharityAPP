@@ -1,0 +1,29 @@
+<%- include('partials/header') %>  
+
+<h2>Welcome, <%= user.name %> 👋</h2>  
+<p>Email: <%= user.email %></p>  
+
+<h2>Create a New Event</h2>
+<form action="/create-event" method="POST">
+    <input type="text" name="title" placeholder="Event Title" required>
+    <textarea name="description" placeholder="Event Description" required></textarea>
+    <input type="date" name="date" required>
+    <input type="text" name="location" placeholder="Event Location" required>
+    <button type="submit">Create Event</button>
+</form>
+
+<h2>My Organized Events</h2>
+<ul>
+    <% events.forEach(event => { %>
+        <li>
+            <strong><%= event.title %></strong> - <%= event.date.toDateString() %> 
+            <a href="/event/<%= event._id %>">View Details</a>
+        </li>
+    <% }); %>
+</ul>
+
+ 
+
+<a href="/logout">Logout</a>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,13 @@
+<%- include('partials/header') %>
+
+<h1>Welcome to Charity & Volunteer Platform</h1>
+<p>Find local events where you can donate or volunteer to help others.</p>
+
+<% if (!user) { %>
+    <a href="/auth/google" class="btn">Login with Google</a>
+<% } else { %>
+    <a href="/dashboard" class="btn">Go to Dashboard</a>
+<% } %>
+
+<%- include('partials/footer') %>
+
