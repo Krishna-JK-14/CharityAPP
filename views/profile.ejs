@@ -112,8 +112,6 @@
                             <p class="event-status <%= isCompleted ? 'completed' : 'upcoming' %>">
                                 <strong>Status:</strong> <%= isCompleted ? 'Completed' : 'Upcoming' %>
                             </p>
-                        </div>
-                    <% }); %>
                             <% if (isCompleted && event.images && event.images.length > 0) { %>
                                 <div class="proof-images">
                                     <p><strong>Images:</strong></p>
@@ -122,6 +120,8 @@
                                     <% }) %>
                                 </div>
                             <% } %>
+                        </div>
+                    <% }); %>
                 <% } else { %>
                     <p>You haven't organized any events yet.</p>
                 <% } %>
@@ -149,9 +149,7 @@
                             <p class="event-status <%= isCompleted ? 'completed' : 'upcoming' %>">
                                 <strong>Status:</strong> <%= isCompleted ? 'Completed' : 'Upcoming' %>
                             </p>
-                        </div>
-                    <% }); %>
-                        <% if (isCompleted && event.images && event.images.length > 0) { %>
+                            <% if (isCompleted && event.images && event.images.length > 0) { %>
                                 <div class="proof-images">
                                     <p><strong>Images:</strong></p>
                                     <% event.images.forEach(image => { %>
@@ -159,6 +157,8 @@
                                     <% }) %>
                                 </div>
                             <% } %>
+                        </div>
+                    <% }); %>
                 <% } else { %>
                     <p>You haven't volunteered for any events yet.</p>
                 <% } %>
