@@ -61,6 +61,24 @@
             height: auto;
             border-radius: 5px;
         }
+        /* Proof Images */
+        .proof-images {
+            margin-top: 10px;
+        }
+        
+        .proof-images img {
+            width: 100px;
+            height: 100px;
+            border-radius: 5px;
+            margin-right: 5px;
+            object-fit: cover;
+            transition: transform 0.3s ease-in-out;
+        }
+
+    
+        .proof-images img:hover {
+            transform: scale(2); /* Enlarge on hover */
+        }
     </style>
 </head>
 <body>
@@ -96,6 +114,14 @@
                             </p>
                         </div>
                     <% }); %>
+                            <% if (isCompleted && event.images && event.images.length > 0) { %>
+                                <div class="proof-images">
+                                    <p><strong>Images:</strong></p>
+                                    <% event.images.forEach(image => { %>
+                                        <img src="uploads/<%= image %>" alt="Proof Image">
+                                    <% }) %>
+                                </div>
+                            <% } %>
                 <% } else { %>
                     <p>You haven't organized any events yet.</p>
                 <% } %>
@@ -125,6 +151,14 @@
                             </p>
                         </div>
                     <% }); %>
+                        <% if (isCompleted && event.images && event.images.length > 0) { %>
+                                <div class="proof-images">
+                                    <p><strong>Images:</strong></p>
+                                    <% event.images.forEach(image => { %>
+                                        <img src="uploads/<%= image %>" alt="Proof Image">
+                                    <% }) %>
+                                </div>
+                            <% } %>
                 <% } else { %>
                     <p>You haven't volunteered for any events yet.</p>
                 <% } %>
