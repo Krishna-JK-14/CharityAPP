@@ -270,7 +270,7 @@ app.post("/events/remove-volunteer/:eventId/:volunteerId", async (req, res) => {
 // Profile Page Route
 app.get("/profile", ensureAuthenticated, async (req, res) => {
   try {
-      const loggedInUserId = req.user?._id;  // Get the logged-in user ID
+      const loggedInUserId = res.locals.loggedInUserId;  // Get the logged-in user ID
 
       if (!loggedInUserId) {
           return res.redirect("/login");  // Redirect if not authenticated
@@ -309,6 +309,10 @@ app.get('/profile2',ensureAuthenticated, async (req, res) => {
       const userId = req.query.userId;
       if (!userId) {
           return res.status(400).send("User ID is required.");
+      }
+
+      if(res.locals.loggedInUserId == userId){
+        return res.redirect('/profile');
       }
 
       // Fetch user details
